@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, Calendar, Clock } from 'lucide-react';
+import { Search, Calendar, Clock, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, FilterCategory } from '@/types';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CategoryBadge } from '@/components/CategoryBadge';
 
@@ -63,6 +64,12 @@ export function SearchDropdown({
     setIsOpen(value.length > 0);
   };
 
+  const handleClearSearch = () => {
+    onSearchChange('');
+    setIsOpen(false);
+    inputRef.current?.focus();
+  };
+
   const handleActivityClick = (activity: Activity) => {
     // Always go to the start date for activities (even if they span multiple days)
     onActivityClick(activity.date);
@@ -91,8 +98,19 @@ export function SearchDropdown({
           value={searchQuery}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => setIsOpen(searchQuery.length > 0)}
-          className="pl-10"
+          className={`pl-10 ${searchQuery ? 'pr-10' : ''}`}
         />
+        {searchQuery && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleClearSearch}
+            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0 hover:bg-muted rounded-full"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       <AnimatePresence>
