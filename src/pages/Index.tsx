@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, FilterCategory, ViewMode } from '@/types';
 import { useTheme } from '@/hooks/useTheme';
@@ -20,6 +20,7 @@ const Index = () => {
   const [categoryFilter, setCategoryFilter] = useState<FilterCategory>('All');
   const [editingActivity, setEditingActivity] = useState<Activity | undefined>();
   const [viewMode, setViewMode] = useState<ViewMode>('day');
+  const yearScrollRef = useRef<(() => void) | null>(null);
 
   const { refreshData } = useCalendarData();
 
@@ -77,6 +78,15 @@ const Index = () => {
     setViewMode(mode);
   };
 
+  const handleGoToToday = () => {
+    if (viewMode === 'year' && yearScrollRef.current) {
+      // Small delay to ensure the date change has been processed
+      setTimeout(() => {
+        yearScrollRef.current?.();
+      }, 100);
+    }
+  };
+
   const handleDateClick = (date: string) => {
     setSelectedDate(date);
   };
@@ -94,6 +104,7 @@ const Index = () => {
         onToggleTheme={toggleTheme}
         viewMode={viewMode}
         onViewModeChange={handleViewModeChange}
+        onGoToToday={handleGoToToday}
       />
 
       <main className="container mx-auto px-4 py-8 pb-24 max-w-6xl">
@@ -141,6 +152,7 @@ const Index = () => {
               onViewChange={setViewMode}
               searchQuery={searchQuery}
               categoryFilter={categoryFilter}
+              onScrollToCurrentMonth={yearScrollRef}
             />
           )}
         </AnimatePresence>
