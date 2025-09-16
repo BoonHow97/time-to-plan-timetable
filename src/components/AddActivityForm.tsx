@@ -229,6 +229,7 @@ export function AddActivityForm({
                           mode="single"
                           selected={startUserSelected ? startDateTime : undefined}
                           defaultMonth={new Date(selectedDate)}
+                          today={new Date(selectedDate)}
                               onSelect={(date) => {
                                 if (date) {
                                   // If there's an existing time, preserve it
@@ -345,6 +346,7 @@ export function AddActivityForm({
                           mode="single"
                           selected={endUserSelected ? endDateTime : undefined}
                           defaultMonth={new Date(selectedDate)}
+                          today={new Date(selectedDate)}
                               onSelect={(date) => {
                                 if (date) {
                                   // If there's an existing time, preserve it
