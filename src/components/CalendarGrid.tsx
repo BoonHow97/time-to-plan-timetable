@@ -35,7 +35,7 @@ export function CalendarGrid({
   }
 
   const today = new Date();
-  const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const todayString = today.toISOString().split('T')[0];
 
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -78,8 +78,8 @@ export function CalendarGrid({
               className={cn(
                 'min-h-[80px] p-2 border-r border-b border-border/30 text-left hover:bg-accent/50 transition-colors',
                 !isCurrentMonth && 'text-muted-foreground/50 bg-muted/10',
-                isToday && 'bg-primary/20 border-primary/50 ring-1 ring-primary/30',
-                isSelected && 'bg-primary/30 border-primary/60',
+                isToday && 'bg-primary/10 border-primary/30',
+                isSelected && 'bg-primary/20 border-primary/50',
                 'last-in-row:border-r-0 last-row:border-b-0'
               )}
               style={{
@@ -90,7 +90,7 @@ export function CalendarGrid({
               <div className="flex flex-col h-full">
                 <div className={cn(
                   'text-sm font-medium mb-1',
-                  isToday && 'text-primary font-black bg-primary/20 rounded-full w-6 h-6 flex items-center justify-center',
+                  isToday && 'text-primary font-bold',
                   isSelected && 'text-primary font-bold'
                 )}>
                   {day.getDate()}
