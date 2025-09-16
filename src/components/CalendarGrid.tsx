@@ -67,7 +67,6 @@ export function CalendarGrid({
           const dayActivities = activities[dateString] || [];
           const isCurrentMonth = day.getMonth() === month;
           const isToday = dateString === todayString;
-          const isSelected = dateString === selectedDate;
           
           return (
             <motion.button
@@ -79,7 +78,6 @@ export function CalendarGrid({
                 'min-h-[80px] p-2 border-r border-b border-border/30 text-left hover:bg-accent/50 transition-colors',
                 !isCurrentMonth && 'text-muted-foreground/50 bg-muted/10',
                 isToday && 'bg-primary/10 border-primary/30',
-                isSelected && 'bg-primary/20 border-primary/50',
                 'last-in-row:border-r-0 last-row:border-b-0'
               )}
               style={{
@@ -90,8 +88,7 @@ export function CalendarGrid({
               <div className="flex flex-col h-full">
                 <div className={cn(
                   'text-sm font-medium mb-1',
-                  isToday && 'text-primary font-bold',
-                  isSelected && 'text-primary font-bold'
+                  isToday && 'text-primary font-bold'
                 )}>
                   {day.getDate()}
                 </div>
