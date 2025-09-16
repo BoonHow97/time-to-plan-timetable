@@ -120,6 +120,15 @@ export function AddActivityForm({
     onCancelEdit?.();
   };
 
+  // Round a Date object to the nearest 5-minute mark
+  const roundToNearestFiveMinutes = (date: Date) => {
+    const d = new Date(date);
+    const minutes = d.getMinutes();
+    const roundedMinutes = Math.round(minutes / 5) * 5;
+    d.setMinutes(roundedMinutes, 0, 0);
+    return d;
+  };
+
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
@@ -199,23 +208,23 @@ export function AddActivityForm({
                         <Calendar
                           mode="single"
                           selected={startDateTime}
-                          onSelect={(date) => {
-                            if (date) {
-                              // If there's an existing time, preserve it
-                              if (startDateTime) {
-                                const newDate = new Date(date);
-                                newDate.setHours(startDateTime.getHours(), startDateTime.getMinutes());
-                                setStartDateTime(newDate);
-                              } else {
-                                // Default to current time
-                                const now = new Date();
-                                date.setHours(now.getHours(), now.getMinutes());
-                                setStartDateTime(date);
-                              }
-                            } else {
-                              setStartDateTime(undefined);
-                            }
-                          }}
+                              onSelect={(date) => {
+                                if (date) {
+                                  // If there's an existing time, preserve it
+                                  if (startDateTime) {
+                                    const newDate = new Date(date);
+                                    newDate.setHours(startDateTime.getHours(), startDateTime.getMinutes());
+                                    setStartDateTime(roundToNearestFiveMinutes(newDate));
+                                  } else {
+                                    // Default to current time
+                                    const now = new Date();
+                                    date.setHours(now.getHours(), now.getMinutes());
+                                    setStartDateTime(roundToNearestFiveMinutes(date));
+                                  }
+                                } else {
+                                  setStartDateTime(undefined);
+                                }
+                              }}
                           initialFocus
                           className="p-3 pointer-events-auto"
                         />
@@ -234,7 +243,7 @@ export function AddActivityForm({
                                   const [hours, minutes] = e.target.value.split(':');
                                   const newDateTime = new Date(startDateTime);
                                   newDateTime.setHours(parseInt(hours), parseInt(minutes));
-                                  setStartDateTime(newDateTime);
+                                  setStartDateTime(roundToNearestFiveMinutes(newDateTime));
                                 }
                               }}
                               className="mt-1"
@@ -268,23 +277,23 @@ export function AddActivityForm({
                         <Calendar
                           mode="single"
                           selected={endDateTime}
-                          onSelect={(date) => {
-                            if (date) {
-                              // If there's an existing time, preserve it
-                              if (endDateTime) {
-                                const newDate = new Date(date);
-                                newDate.setHours(endDateTime.getHours(), endDateTime.getMinutes());
-                                setEndDateTime(newDate);
-                              } else {
-                                // Default to 1 hour after start time, or current time + 1 hour
-                                const baseTime = startDateTime || new Date();
-                                date.setHours(baseTime.getHours() + 1, baseTime.getMinutes());
-                                setEndDateTime(date);
-                              }
-                            } else {
-                              setEndDateTime(undefined);
-                            }
-                          }}
+                              onSelect={(date) => {
+                                if (date) {
+                                  // If there's an existing time, preserve it
+                                  if (endDateTime) {
+                                    const newDate = new Date(date);
+                                    newDate.setHours(endDateTime.getHours(), endDateTime.getMinutes());
+                                    setEndDateTime(roundToNearestFiveMinutes(newDate));
+                                  } else {
+                                    // Default to 1 hour after start time, or current time + 1 hour
+                                    const baseTime = startDateTime || new Date();
+                                    date.setHours(baseTime.getHours() + 1, baseTime.getMinutes());
+                                    setEndDateTime(roundToNearestFiveMinutes(date));
+                                  }
+                                } else {
+                                  setEndDateTime(undefined);
+                                }
+                              }}
                           initialFocus
                           className="p-3 pointer-events-auto"
                         />
@@ -303,7 +312,7 @@ export function AddActivityForm({
                                   const [hours, minutes] = e.target.value.split(':');
                                   const newDateTime = new Date(endDateTime);
                                   newDateTime.setHours(parseInt(hours), parseInt(minutes));
-                                  setEndDateTime(newDateTime);
+                                  setEndDateTime(roundToNearestFiveMinutes(newDateTime));
                                 }
                               }}
                               className="mt-1"
