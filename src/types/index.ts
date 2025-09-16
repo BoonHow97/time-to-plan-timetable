@@ -6,6 +6,8 @@ export interface Activity {
   name: string;
   category: Category;
   time?: string; // Optional time for timeline items
+  endTime?: string; // Optional end time
+  endDate?: string; // Optional end date (YYYY-MM-DD format)
   completed?: boolean; // For to-do items
   date: string; // YYYY-MM-DD format
 }

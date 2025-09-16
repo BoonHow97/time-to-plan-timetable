@@ -1,8 +1,8 @@
 import { Search, Moon, Sun, ChevronLeft, ChevronRight, Calendar, Grid3X3, CalendarDays } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { FilterCategory, ViewMode } from '@/types';
+import { FilterCategory, ViewMode, Activity } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { SearchDropdown } from '@/components/SearchDropdown';
 import {
   Select,
   SelectContent,
@@ -23,6 +23,7 @@ interface HeaderProps {
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
   onGoToToday?: () => void;
+  allActivities?: Activity[];
 }
 
 export function Header({
@@ -37,6 +38,7 @@ export function Header({
   viewMode,
   onViewModeChange,
   onGoToToday,
+  allActivities = [],
 }: HeaderProps) {
   const selectedDateObj = new Date(selectedDate);
   const today = new Date().toISOString().split('T')[0];
@@ -155,15 +157,13 @@ export function Header({
           </div>
 
           {/* Search Bar */}
-          <div className="flex-1 max-w-md relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search activities..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+          <SearchDropdown
+            searchQuery={searchQuery}
+            onSearchChange={onSearchChange}
+            activities={allActivities}
+            categoryFilter={categoryFilter}
+            onActivityClick={onDateChange}
+          />
 
           {/* Filters and Theme Toggle */}
           <div className="flex items-center gap-2">
@@ -274,15 +274,14 @@ export function Header({
 
           {/* Search and Filter */}
           <div className="flex gap-2">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+            <SearchDropdown
+              searchQuery={searchQuery}
+              onSearchChange={onSearchChange}
+              activities={allActivities}
+              categoryFilter={categoryFilter}
+              onActivityClick={onDateChange}
+              placeholder="Search..."
+            />
             
             <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
               <SelectTrigger className="w-24">

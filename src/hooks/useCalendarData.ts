@@ -79,10 +79,22 @@ export function useCalendarData() {
     setAllActivities(activities);
   };
 
+  // Flatten all activities for search
+  const getAllActivitiesFlat = (): Activity[] => {
+    const flatActivities: Activity[] = [];
+    Object.entries(allActivities).forEach(([date, activities]) => {
+      activities.forEach(activity => {
+        flatActivities.push({ ...activity, date });
+      });
+    });
+    return flatActivities;
+  };
+
   return {
     getActivitiesForDate,
     getActivitiesForMonth,
     getActivitiesForYear,
     refreshData,
+    allActivities: getAllActivitiesFlat(),
   };
 }

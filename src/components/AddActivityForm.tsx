@@ -30,6 +30,8 @@ export function AddActivityForm({
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState('');
   const [time, setTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [category, setCategory] = useState<Category>('Work');
 
   useEffect(() => {
@@ -37,6 +39,8 @@ export function AddActivityForm({
       setIsOpen(true);
       setName(editingActivity.name);
       setTime(editingActivity.time || '');
+      setEndTime(editingActivity.endTime || '');
+      setEndDate(editingActivity.endDate || '');
       setCategory(editingActivity.category);
     }
   }, [editingActivity]);
@@ -49,6 +53,8 @@ export function AddActivityForm({
       name: name.trim(),
       category,
       time: time || undefined,
+      endTime: endTime || undefined,
+      endDate: endDate || undefined,
       completed: time ? undefined : false,
     };
 
@@ -62,6 +68,8 @@ export function AddActivityForm({
     // Reset form
     setName('');
     setTime('');
+    setEndTime('');
+    setEndDate('');
     setCategory('Work');
     setIsOpen(false);
   };
@@ -69,6 +77,8 @@ export function AddActivityForm({
   const handleCancel = () => {
     setName('');
     setTime('');
+    setEndTime('');
+    setEndDate('');
     setCategory('Work');
     setIsOpen(false);
     onCancelEdit?.();
@@ -116,7 +126,7 @@ export function AddActivityForm({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="activity-time">Time (Optional)</Label>
+                    <Label htmlFor="activity-time">Start Time (Optional)</Label>
                     <Input
                       id="activity-time"
                       type="time"
@@ -124,8 +134,30 @@ export function AddActivityForm({
                       onChange={(e) => setTime(e.target.value)}
                       className="w-full"
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="activity-end-time">End Time (Optional)</Label>
+                    <Input
+                      id="activity-end-time"
+                      type="time"
+                      value={endTime}
+                      onChange={(e) => setEndTime(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="activity-end-date">End Date (Optional)</Label>
+                    <Input
+                      id="activity-end-date"
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="w-full"
+                    />
                     <p className="text-xs text-muted-foreground">
-                      Leave empty to add to to-do list
+                      Leave start time empty to add to to-do list
                     </p>
                   </div>
 
