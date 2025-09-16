@@ -1,9 +1,7 @@
 import { motion } from 'framer-motion';
-import { useRef } from 'react';
 import { CalendarGrid } from './CalendarGrid';
 import { useCalendarData } from '@/hooks/useCalendarData';
 import { FilterCategory, Activity } from '@/types';
-import { Button } from './ui/button';
 
 interface YearViewProps {
   selectedDate: string;
@@ -17,7 +15,6 @@ export function YearView({ selectedDate, onDateClick, onViewChange, searchQuery,
   const { getActivitiesForYear } = useCalendarData();
   const selectedDateObj = new Date(selectedDate);
   const year = selectedDateObj.getFullYear();
-  const monthRefs = useRef<(HTMLDivElement | null)[]>([]);
   
   const yearActivities = getActivitiesForYear(year);
   
@@ -37,19 +34,6 @@ export function YearView({ selectedDate, onDateClick, onViewChange, searchQuery,
   const handleDateClick = (date: string) => {
     onDateClick(date);
     onViewChange('day');
-  };
-
-  const scrollToToday = () => {
-    const today = new Date();
-    const currentMonth = today.getMonth();
-    const monthElement = monthRefs.current[currentMonth];
-    
-    if (monthElement) {
-      monthElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
-    }
   };
 
   const months = Array.from({ length: 12 }, (_, i) => {
@@ -72,14 +56,6 @@ export function YearView({ selectedDate, onDateClick, onViewChange, searchQuery,
         <h1 className="text-3xl font-bold text-foreground mb-2">
           {year}
         </h1>
-        <Button 
-          onClick={scrollToToday}
-          variant="outline"
-          size="sm"
-          className="mb-4"
-        >
-          Go to Today
-        </Button>
         <p className="text-muted-foreground">
           Click on any date to view details
         </p>
@@ -89,7 +65,6 @@ export function YearView({ selectedDate, onDateClick, onViewChange, searchQuery,
         {months.map(({ month }) => (
           <motion.div
             key={month}
-            ref={(el) => (monthRefs.current[month] = el)}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2, delay: month * 0.05 }}
