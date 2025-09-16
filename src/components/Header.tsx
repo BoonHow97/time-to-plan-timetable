@@ -149,34 +149,30 @@ export function Header({
             })}
           </div>
 
-          {/* Search Bar - only show in day view */}
-          {viewMode === 'day' && (
-            <div className="flex-1 max-w-md relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search activities..."
-                value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          )}
+          {/* Search Bar */}
+          <div className="flex-1 max-w-md relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search activities..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-10"
+            />
+          </div>
 
           {/* Filters and Theme Toggle */}
           <div className="flex items-center gap-2">
-            {viewMode === 'day' && (
-              <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All">All</SelectItem>
-                  <SelectItem value="Work">Work</SelectItem>
-                  <SelectItem value="Leisure">Leisure</SelectItem>
-                  <SelectItem value="Event">Event</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
+            <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All</SelectItem>
+                <SelectItem value="Work">Work</SelectItem>
+                <SelectItem value="Leisure">Leisure</SelectItem>
+                <SelectItem value="Event">Event</SelectItem>
+              </SelectContent>
+            </Select>
 
             <Button
               variant="outline"
@@ -271,32 +267,30 @@ export function Header({
             </div>
           </div>
 
-          {/* Search and Filter - only show in day view */}
-          {viewMode === 'day' && (
-            <div className="flex gap-2">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => onSearchChange(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              
-              <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
-                <SelectTrigger className="w-24">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All">All</SelectItem>
-                  <SelectItem value="Work">Work</SelectItem>
-                  <SelectItem value="Leisure">Leisure</SelectItem>
-                  <SelectItem value="Event">Event</SelectItem>
-                </SelectContent>
-              </Select>
+          {/* Search and Filter */}
+          <div className="flex gap-2">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                className="pl-10"
+              />
             </div>
-          )}
+            
+            <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
+              <SelectTrigger className="w-24">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All</SelectItem>
+                <SelectItem value="Work">Work</SelectItem>
+                <SelectItem value="Leisure">Leisure</SelectItem>
+                <SelectItem value="Event">Event</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
     </motion.header>

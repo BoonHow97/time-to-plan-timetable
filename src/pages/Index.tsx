@@ -75,11 +75,6 @@ const Index = () => {
 
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
-    // Clear search and filters when switching away from day view
-    if (mode !== 'day') {
-      setSearchQuery('');
-      setCategoryFilter('All');
-    }
   };
 
   const handleDateClick = (date: string) => {
@@ -133,6 +128,8 @@ const Index = () => {
               selectedDate={selectedDate}
               onDateClick={handleDateClick}
               onViewChange={setViewMode}
+              searchQuery={searchQuery}
+              categoryFilter={categoryFilter}
             />
           )}
           
@@ -142,6 +139,8 @@ const Index = () => {
               selectedDate={selectedDate}
               onDateClick={handleDateClick}
               onViewChange={setViewMode}
+              searchQuery={searchQuery}
+              categoryFilter={categoryFilter}
             />
           )}
         </AnimatePresence>

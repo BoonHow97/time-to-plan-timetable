@@ -1,19 +1,35 @@
 import { motion } from 'framer-motion';
 import { CalendarGrid } from './CalendarGrid';
 import { useCalendarData } from '@/hooks/useCalendarData';
+import { FilterCategory, Activity } from '@/types';
 
 interface YearViewProps {
   selectedDate: string;
   onDateClick: (date: string) => void;
   onViewChange: (view: 'day') => void;
+  searchQuery: string;
+  categoryFilter: FilterCategory;
 }
 
-export function YearView({ selectedDate, onDateClick, onViewChange }: YearViewProps) {
+export function YearView({ selectedDate, onDateClick, onViewChange, searchQuery, categoryFilter }: YearViewProps) {
   const { getActivitiesForYear } = useCalendarData();
   const selectedDateObj = new Date(selectedDate);
   const year = selectedDateObj.getFullYear();
   
   const yearActivities = getActivitiesForYear(year);
+  
+  // Filter activities based on search and category
+  const filteredYearActivities: Record<string, Activity[]> = {};
+  Object.entries(yearActivities).forEach(([date, activities]) => {
+    const filtered = activities.filter(activity => {
+      const matchesSearch = activity.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = categoryFilter === 'All' || activity.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    });
+    if (filtered.length > 0) {
+      filteredYearActivities[date] = filtered;
+    }
+  });
 
   const handleDateClick = (date: string) => {
     onDateClick(date);
@@ -56,7 +72,7 @@ export function YearView({ selectedDate, onDateClick, onViewChange }: YearViewPr
             <CalendarGrid
               year={year}
               month={month}
-              activities={yearActivities}
+              activities={filteredYearActivities}
               onDateClick={handleDateClick}
               selectedDate={selectedDate}
             />

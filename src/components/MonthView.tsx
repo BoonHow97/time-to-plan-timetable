@@ -1,20 +1,36 @@
 import { motion } from 'framer-motion';
 import { CalendarGrid } from './CalendarGrid';
 import { useCalendarData } from '@/hooks/useCalendarData';
+import { FilterCategory, Activity } from '@/types';
 
 interface MonthViewProps {
   selectedDate: string;
   onDateClick: (date: string) => void;
   onViewChange: (view: 'day') => void;
+  searchQuery: string;
+  categoryFilter: FilterCategory;
 }
 
-export function MonthView({ selectedDate, onDateClick, onViewChange }: MonthViewProps) {
+export function MonthView({ selectedDate, onDateClick, onViewChange, searchQuery, categoryFilter }: MonthViewProps) {
   const { getActivitiesForMonth } = useCalendarData();
   const selectedDateObj = new Date(selectedDate);
   const year = selectedDateObj.getFullYear();
   const month = selectedDateObj.getMonth();
   
   const monthActivities = getActivitiesForMonth(year, month);
+  
+  // Filter activities based on search and category
+  const filteredMonthActivities: Record<string, Activity[]> = {};
+  Object.entries(monthActivities).forEach(([date, activities]) => {
+    const filtered = activities.filter(activity => {
+      const matchesSearch = activity.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = categoryFilter === 'All' || activity.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    });
+    if (filtered.length > 0) {
+      filteredMonthActivities[date] = filtered;
+    }
+  });
 
   const handleDateClick = (date: string) => {
     onDateClick(date);
@@ -44,7 +60,7 @@ export function MonthView({ selectedDate, onDateClick, onViewChange }: MonthView
       <CalendarGrid
         year={year}
         month={month}
-        activities={monthActivities}
+        activities={filteredMonthActivities}
         onDateClick={handleDateClick}
         selectedDate={selectedDate}
       />
