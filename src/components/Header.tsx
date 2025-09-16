@@ -22,6 +22,7 @@ interface HeaderProps {
   onToggleTheme: () => void;
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
+  onGoToToday?: () => void;
 }
 
 export function Header({
@@ -35,6 +36,7 @@ export function Header({
   onToggleTheme,
   viewMode,
   onViewModeChange,
+  onGoToToday,
 }: HeaderProps) {
   const selectedDateObj = new Date(selectedDate);
   const today = new Date().toISOString().split('T')[0];
@@ -56,6 +58,9 @@ export function Header({
 
   const goToToday = () => {
     onDateChange(today);
+    if (onGoToToday) {
+      onGoToToday();
+    }
   };
 
   const getDateDisplay = () => {

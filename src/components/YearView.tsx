@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useRef, useEffect } from 'react';
 import { CalendarGrid } from './CalendarGrid';
 import { useCalendarData } from '@/hooks/useCalendarData';
 import { FilterCategory, Activity } from '@/types';
@@ -9,9 +10,10 @@ interface YearViewProps {
   onViewChange: (view: 'day') => void;
   searchQuery: string;
   categoryFilter: FilterCategory;
+  onScrollToCurrentMonth?: React.MutableRefObject<(() => void) | null>;
 }
 
-export function YearView({ selectedDate, onDateClick, onViewChange, searchQuery, categoryFilter }: YearViewProps) {
+export function YearView({ selectedDate, onDateClick, onViewChange, searchQuery, categoryFilter, onScrollToCurrentMonth }: YearViewProps) {
   const { getActivitiesForYear } = useCalendarData();
   const selectedDateObj = new Date(selectedDate);
   const year = selectedDateObj.getFullYear();
@@ -36,6 +38,9 @@ export function YearView({ selectedDate, onDateClick, onViewChange, searchQuery,
     onViewChange('day');
   };
 
+  const currentMonth = new Date().getMonth();
+  const currentMonthRef = useRef<HTMLDivElement>(null);
+
   const months = Array.from({ length: 12 }, (_, i) => {
     const monthDate = new Date(year, i, 1);
     return {
@@ -43,6 +48,22 @@ export function YearView({ selectedDate, onDateClick, onViewChange, searchQuery,
       name: monthDate.toLocaleDateString('en-US', { month: 'long' }),
     };
   });
+
+  const scrollToCurrentMonth = () => {
+    if (currentMonthRef.current) {
+      currentMonthRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (onScrollToCurrentMonth) {
+      // Register the scroll function
+      onScrollToCurrentMonth.current = scrollToCurrentMonth;
+    }
+  }, [onScrollToCurrentMonth, scrollToCurrentMonth]);
 
   return (
     <motion.div
@@ -65,6 +86,7 @@ export function YearView({ selectedDate, onDateClick, onViewChange, searchQuery,
         {months.map(({ month }) => (
           <motion.div
             key={month}
+            ref={month === currentMonth ? currentMonthRef : null}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2, delay: month * 0.05 }}
