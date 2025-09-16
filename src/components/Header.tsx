@@ -163,6 +163,7 @@ export function Header({
             activities={allActivities}
             categoryFilter={categoryFilter}
             onActivityClick={onDateChange}
+            onViewModeChange={(mode) => onViewModeChange(mode)}
           />
 
           {/* Filters and Theme Toggle */}
@@ -280,6 +281,7 @@ export function Header({
               activities={allActivities}
               categoryFilter={categoryFilter}
               onActivityClick={onDateChange}
+              onViewModeChange={(mode) => onViewModeChange(mode)}
               placeholder="Search..."
             />
             
