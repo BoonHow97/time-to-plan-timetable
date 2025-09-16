@@ -123,6 +123,7 @@ const Index = () => {
                 activities={filteredTimelineItems}
                 onEdit={handleEditActivity}
                 onDelete={handleDeleteActivity}
+                currentDate={selectedDate}
               />
 
               <TodoSection
@@ -130,6 +131,7 @@ const Index = () => {
                 onEdit={handleEditActivity}
                 onDelete={handleDeleteActivity}
                 onToggleComplete={toggleTaskCompletion}
+                currentDate={selectedDate}
               />
             </motion.div>
           )}

@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Edit, Trash2, Check } from 'lucide-react';
 import { Activity } from '@/types';
 import { CategoryBadge } from './CategoryBadge';
@@ -12,6 +11,7 @@ interface ActivityItemProps {
   onDelete: (id: string) => void;
   onToggleComplete?: (id: string) => void;
   showTime?: boolean;
+  currentDate?: string;
 }
 
 export function ActivityItem({
@@ -20,15 +20,14 @@ export function ActivityItem({
   onDelete,
   onToggleComplete,
   showTime = false,
+  currentDate,
 }: ActivityItemProps) {
   const isCompleted = activity.completed === true;
+  const isMultiDay = activity.endDate && activity.endDate !== activity.date;
+  const isStartDate = !currentDate || currentDate === activity.date;
   
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.2 }}
+    <div
       className={cn(
         'group bg-card rounded-xl p-4 shadow-card hover:shadow-card-hover transition-all duration-200',
         'border border-border/50',
@@ -45,30 +44,37 @@ export function ActivityItem({
             />
           )}
           
-          {showTime && activity.time && (
+          {showTime && (
             <div className="flex flex-col min-w-[80px]">
-              <div className="text-sm font-bold text-foreground">
-                {new Date(`2000-01-01T${activity.time}`).toLocaleTimeString([], {
-                  hour: 'numeric',
-                  minute: '2-digit',
-                  hour12: true,
-                })}
-              </div>
-              {(activity.endTime || activity.endDate) && (
+              {isStartDate && activity.time ? (
+                <div className="text-sm font-bold text-foreground">
+                  {new Date(`2000-01-01T${activity.time}`).toLocaleTimeString([], {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                  })}
+                </div>
+              ) : isMultiDay ? (
+                <div className="text-sm font-bold text-foreground">
+                  {new Date(activity.date).toLocaleDateString([], {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </div>
+              ) : null}
+              
+              {isMultiDay && activity.endDate && (
                 <div className="text-xs text-muted-foreground">
-                  to{' '}
-                  {activity.endTime && 
-                    new Date(`2000-01-01T${activity.endTime}`).toLocaleTimeString([], {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                      hour12: true,
-                    })
-                  }
-                  {activity.endDate && activity.endDate !== activity.date && (
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {new Date(activity.endDate).toLocaleDateString([], {
-                        month: 'short',
-                        day: 'numeric',
+                  <div>to {new Date(activity.endDate).toLocaleDateString([], {
+                    month: 'short',
+                    day: 'numeric',
+                  })}</div>
+                  {activity.endTime && (
+                    <div>
+                      {new Date(`2000-01-01T${activity.endTime}`).toLocaleTimeString([], {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true,
                       })}
                     </div>
                   )}
@@ -108,6 +114,6 @@ export function ActivityItem({
           </Button>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
