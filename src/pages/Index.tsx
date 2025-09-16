@@ -159,6 +159,7 @@ const Index = () => {
           onUpdate={handleUpdateActivity}
           editingActivity={editingActivity}
           onCancelEdit={handleCancelEdit}
+          selectedDate={selectedDate}
         />
       )}
     </div>

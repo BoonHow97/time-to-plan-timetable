@@ -28,6 +28,7 @@ interface AddActivityFormProps {
   onUpdate?: (id: string, activity: Partial<Activity>) => void;
   editingActivity?: Activity;
   onCancelEdit?: () => void;
+  selectedDate: string;
 }
 
 export function AddActivityForm({
@@ -35,6 +36,7 @@ export function AddActivityForm({
   onUpdate,
   editingActivity,
   onCancelEdit,
+  selectedDate,
 }: AddActivityFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState('');
@@ -219,12 +221,13 @@ export function AddActivityForm({
                                     const newDate = new Date(date);
                                     newDate.setHours(startDateTime.getHours(), startDateTime.getMinutes());
                                     setStartDateTime(roundToNearestFiveMinutes(newDate));
-                                  } else {
-                                    // Default to current time
-                                    const now = new Date();
-                                    date.setHours(now.getHours(), now.getMinutes());
-                                    setStartDateTime(roundToNearestFiveMinutes(date));
-                                  }
+                                   } else {
+                                     // Default to selected date with current time
+                                     const selectedDateObj = new Date(selectedDate);
+                                     const now = new Date();
+                                     selectedDateObj.setHours(now.getHours(), now.getMinutes());
+                                     setStartDateTime(roundToNearestFiveMinutes(selectedDateObj));
+                                   }
                                 } else {
                                   setStartDateTime(undefined);
                                 }
@@ -325,12 +328,17 @@ export function AddActivityForm({
                                     const newDate = new Date(date);
                                     newDate.setHours(endDateTime.getHours(), endDateTime.getMinutes());
                                     setEndDateTime(roundToNearestFiveMinutes(newDate));
-                                  } else {
-                                    // Default to 1 hour after start time, or current time + 1 hour
-                                    const baseTime = startDateTime || new Date();
-                                    date.setHours(baseTime.getHours() + 1, baseTime.getMinutes());
-                                    setEndDateTime(roundToNearestFiveMinutes(date));
-                                  }
+                                   } else {
+                                     // Default to 1 hour after start time, or selected date + 1 hour
+                                     const baseTime = startDateTime || (() => {
+                                       const selectedDateObj = new Date(selectedDate);
+                                       const now = new Date();
+                                       selectedDateObj.setHours(now.getHours(), now.getMinutes());
+                                       return selectedDateObj;
+                                     })();
+                                     date.setHours(baseTime.getHours() + 1, baseTime.getMinutes());
+                                     setEndDateTime(roundToNearestFiveMinutes(date));
+                                   }
                                 } else {
                                   setEndDateTime(undefined);
                                 }
