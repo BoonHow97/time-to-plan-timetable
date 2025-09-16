@@ -44,6 +44,9 @@ export function AddActivityForm({
   const [endDateTime, setEndDateTime] = useState<Date | undefined>(undefined);
   const [category, setCategory] = useState<Category>('Work');
   const [description, setDescription] = useState('');
+  // Track whether user explicitly selected a date in the calendars
+  const [startUserSelected, setStartUserSelected] = useState(false);
+  const [endUserSelected, setEndUserSelected] = useState(false);
 
   useEffect(() => {
     if (editingActivity) {
@@ -79,6 +82,9 @@ export function AddActivityForm({
       }
       
       setCategory(editingActivity.category);
+      // Mark as user-selected when editing existing times/dates
+      setStartUserSelected(!!editingActivity.time);
+      setEndUserSelected(!!editingActivity.endDate || !!editingActivity.endTime);
     }
   }, [editingActivity]);
 
@@ -201,6 +207,14 @@ export function AddActivityForm({
                             "w-full justify-start text-left font-normal",
                             !startDateTime && "text-muted-foreground"
                           )}
+                          onClick={() => {
+                            if (!startDateTime) {
+                              const d = new Date(selectedDate);
+                              d.setHours(0, 0, 0, 0);
+                              setStartDateTime(d);
+                              setStartUserSelected(false);
+                            }
+                          }}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {startDateTime ? (
@@ -210,10 +224,10 @@ export function AddActivityForm({
                           )}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start" side="top" sideOffset={5}>
+                      <PopoverContent className="w-auto p-0" align="start" side="top" sideOffset={5} avoidCollisions={false}>
                         <Calendar
                           mode="single"
-                          selected={startDateTime ?? new Date(selectedDate)}
+                          selected={startUserSelected ? startDateTime : undefined}
                           defaultMonth={new Date(selectedDate)}
                               onSelect={(date) => {
                                 if (date) {
@@ -257,7 +271,7 @@ export function AddActivityForm({
                                   <SelectTrigger>
                                     <SelectValue />
                                   </SelectTrigger>
-                                  <SelectContent side="top">
+                                  <SelectContent side="top" avoidCollisions={false}>
                                     {hourOptions.map((hour) => (
                                       <SelectItem key={hour} value={hour}>
                                         {hour}
@@ -283,7 +297,7 @@ export function AddActivityForm({
                                   <SelectTrigger>
                                     <SelectValue />
                                   </SelectTrigger>
-                                  <SelectContent side="top">
+                                  <SelectContent side="top" avoidCollisions={false}>
                                     {minuteOptions.map((minute) => (
                                       <SelectItem key={minute} value={minute}>
                                         {minute}
@@ -309,6 +323,14 @@ export function AddActivityForm({
                             "w-full justify-start text-left font-normal",
                             !endDateTime && "text-muted-foreground"
                           )}
+                          onClick={() => {
+                            if (!endDateTime) {
+                              const d = new Date(selectedDate);
+                              d.setHours(0, 0, 0, 0);
+                              setEndDateTime(d);
+                              setEndUserSelected(false);
+                            }
+                          }}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {endDateTime ? (
@@ -318,10 +340,10 @@ export function AddActivityForm({
                           )}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start" side="top" sideOffset={5}>
+                      <PopoverContent className="w-auto p-0" align="start" side="top" sideOffset={5} avoidCollisions={false}>
                         <Calendar
                           mode="single"
-                          selected={endDateTime ?? new Date(selectedDate)}
+                          selected={endUserSelected ? endDateTime : undefined}
                           defaultMonth={new Date(selectedDate)}
                               onSelect={(date) => {
                                 if (date) {
@@ -369,7 +391,7 @@ export function AddActivityForm({
                                   <SelectTrigger>
                                     <SelectValue />
                                   </SelectTrigger>
-                                  <SelectContent side="top">
+                                  <SelectContent side="top" avoidCollisions={false}>
                                     {hourOptions.map((hour) => (
                                       <SelectItem key={hour} value={hour}>
                                         {hour}
@@ -395,7 +417,7 @@ export function AddActivityForm({
                                   <SelectTrigger>
                                     <SelectValue />
                                   </SelectTrigger>
-                                  <SelectContent side="top">
+                                  <SelectContent side="top" avoidCollisions={false}>
                                     {minuteOptions.map((minute) => (
                                       <SelectItem key={minute} value={minute}>
                                         {minute}
