@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import {
   Popover,
@@ -40,11 +41,13 @@ export function AddActivityForm({
   const [startDateTime, setStartDateTime] = useState<Date | undefined>(undefined);
   const [endDateTime, setEndDateTime] = useState<Date | undefined>(undefined);
   const [category, setCategory] = useState<Category>('Work');
+  const [description, setDescription] = useState('');
 
   useEffect(() => {
     if (editingActivity) {
       setIsOpen(true);
       setName(editingActivity.name);
+      setDescription(editingActivity.description || '');
       
       // Parse start date/time
       if (editingActivity.time) {
@@ -88,6 +91,7 @@ export function AddActivityForm({
       endTime: endDateTime ? format(endDateTime, 'HH:mm') : undefined,
       endDate: endDateTime ? format(endDateTime, 'yyyy-MM-dd') : undefined,
       completed: startDateTime ? undefined : false,
+      description: description.trim() || undefined,
     };
 
     if (editingActivity && onUpdate) {
@@ -102,6 +106,7 @@ export function AddActivityForm({
     setStartDateTime(undefined);
     setEndDateTime(undefined);
     setCategory('Work');
+    setDescription('');
     setIsOpen(false);
   };
 
@@ -110,9 +115,33 @@ export function AddActivityForm({
     setStartDateTime(undefined);
     setEndDateTime(undefined);
     setCategory('Work');
+    setDescription('');
     setIsOpen(false);
     onCancelEdit?.();
   };
+
+  // Helper function to round minutes to nearest 5-minute interval
+  const roundToNearestFiveMinutes = (date: Date) => {
+    const minutes = date.getMinutes();
+    const roundedMinutes = Math.round(minutes / 5) * 5;
+    const newDate = new Date(date);
+    newDate.setMinutes(roundedMinutes, 0, 0);
+    return newDate;
+  };
+
+  // Generate time options in 5-minute intervals
+  const generateTimeOptions = () => {
+    const options = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 5) {
+        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        options.push(time);
+      }
+    }
+    return options;
+  };
+
+  const timeOptions = generateTimeOptions();
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
@@ -141,6 +170,20 @@ export function AddActivityForm({
                     >
                       <X className="h-4 w-4" />
                     </Button>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="activity-category">Category</Label>
+                    <Select value={category} onValueChange={(value: Category) => setCategory(value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Work">Work</SelectItem>
+                        <SelectItem value="Leisure">Leisure</SelectItem>
+                        <SelectItem value="Event">Event</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="space-y-2">
@@ -203,20 +246,28 @@ export function AddActivityForm({
                             <Label htmlFor="start-time" className="text-sm font-medium">
                               Time
                             </Label>
-                            <Input
-                              id="start-time"
-                              type="time"
+                            <Select
                               value={format(startDateTime, 'HH:mm')}
-                              onChange={(e) => {
-                                if (e.target.value && startDateTime) {
-                                  const [hours, minutes] = e.target.value.split(':');
+                              onValueChange={(value) => {
+                                if (value && startDateTime) {
+                                  const [hours, minutes] = value.split(':');
                                   const newDateTime = new Date(startDateTime);
                                   newDateTime.setHours(parseInt(hours), parseInt(minutes));
                                   setStartDateTime(newDateTime);
                                 }
                               }}
-                              className="mt-1"
-                            />
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="max-h-60">
+                                {timeOptions.map((time) => (
+                                  <SelectItem key={time} value={time}>
+                                    {time}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
                         )}
                       </PopoverContent>
@@ -271,20 +322,28 @@ export function AddActivityForm({
                             <Label htmlFor="end-time" className="text-sm font-medium">
                               Time
                             </Label>
-                            <Input
-                              id="end-time"
-                              type="time"
+                            <Select
                               value={format(endDateTime, 'HH:mm')}
-                              onChange={(e) => {
-                                if (e.target.value && endDateTime) {
-                                  const [hours, minutes] = e.target.value.split(':');
+                              onValueChange={(value) => {
+                                if (value && endDateTime) {
+                                  const [hours, minutes] = value.split(':');
                                   const newDateTime = new Date(endDateTime);
                                   newDateTime.setHours(parseInt(hours), parseInt(minutes));
                                   setEndDateTime(newDateTime);
                                 }
                               }}
-                              className="mt-1"
-                            />
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="max-h-60">
+                                {timeOptions.map((time) => (
+                                  <SelectItem key={time} value={time}>
+                                    {time}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
                         )}
                       </PopoverContent>
@@ -295,17 +354,14 @@ export function AddActivityForm({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="activity-category">Category</Label>
-                    <Select value={category} onValueChange={(value: Category) => setCategory(value)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Work">Work</SelectItem>
-                        <SelectItem value="Leisure">Leisure</SelectItem>
-                        <SelectItem value="Event">Event</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="activity-description">Description (Optional)</Label>
+                    <Textarea
+                      id="activity-description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Add a description for your activity..."
+                      className="min-h-[80px] resize-none"
+                    />
                   </div>
 
                   <div className="flex gap-2">
