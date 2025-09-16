@@ -22,7 +22,7 @@ const Index = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('day');
   const yearScrollRef = useRef<(() => void) | null>(null);
 
-  const { refreshData } = useCalendarData();
+  const { refreshData, allActivities } = useCalendarData();
 
   const {
     timelineItems,
@@ -105,6 +105,7 @@ const Index = () => {
         viewMode={viewMode}
         onViewModeChange={handleViewModeChange}
         onGoToToday={handleGoToToday}
+        allActivities={allActivities}
       />
 
       <main className="container mx-auto px-4 py-8 pb-24 max-w-6xl">
