@@ -1,6 +1,6 @@
-import { Search, Moon, Sun, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Moon, Sun, ChevronLeft, ChevronRight, Calendar, Grid3X3, CalendarDays } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { FilterCategory } from '@/types';
+import { FilterCategory, ViewMode } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -20,6 +20,8 @@ interface HeaderProps {
   onCategoryFilterChange: (filter: FilterCategory) => void;
   isDarkMode: boolean;
   onToggleTheme: () => void;
+  viewMode: ViewMode;
+  onViewModeChange: (mode: ViewMode) => void;
 }
 
 export function Header({
@@ -31,6 +33,8 @@ export function Header({
   onCategoryFilterChange,
   isDarkMode,
   onToggleTheme,
+  viewMode,
+  onViewModeChange,
 }: HeaderProps) {
   const selectedDateObj = new Date(selectedDate);
   const today = new Date().toISOString().split('T')[0];
@@ -38,12 +42,43 @@ export function Header({
 
   const navigateDate = (direction: 'prev' | 'next') => {
     const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() + (direction === 'next' ? 1 : -1));
+    
+    if (viewMode === 'day') {
+      newDate.setDate(newDate.getDate() + (direction === 'next' ? 1 : -1));
+    } else if (viewMode === 'month') {
+      newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1));
+    } else if (viewMode === 'year') {
+      newDate.setFullYear(newDate.getFullYear() + (direction === 'next' ? 1 : -1));
+    }
+    
     onDateChange(newDate.toISOString().split('T')[0]);
   };
 
   const goToToday = () => {
     onDateChange(today);
+  };
+
+  const getDateDisplay = () => {
+    if (viewMode === 'day') {
+      return selectedDateObj.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+      });
+    } else if (viewMode === 'month') {
+      return selectedDateObj.toLocaleDateString('en-US', {
+        month: 'long',
+        year: 'numeric',
+      });
+    } else {
+      return selectedDateObj.getFullYear().toString();
+    }
+  };
+
+  const viewModeIcons = {
+    day: CalendarDays,
+    month: Calendar,
+    year: Grid3X3,
   };
 
   return (
@@ -66,13 +101,9 @@ export function Header({
               <ChevronLeft className="h-4 w-4" />
             </Button>
             
-            <div className="flex flex-col items-center min-w-[140px]">
+            <div className="flex flex-col items-center min-w-[160px]">
               <div className="font-bold text-foreground">
-                {selectedDateObj.toLocaleDateString('en-US', {
-                  weekday: 'short',
-                  month: 'short',
-                  day: 'numeric',
-                })}
+                {getDateDisplay()}
               </div>
               {!isToday && (
                 <Button
@@ -84,7 +115,7 @@ export function Header({
                   Go to Today
                 </Button>
               )}
-              {isToday && (
+              {isToday && viewMode === 'day' && (
                 <span className="text-xs text-primary font-medium">Today</span>
               )}
             </div>
@@ -99,30 +130,53 @@ export function Header({
             </Button>
           </div>
 
-          {/* Search Bar */}
-          <div className="flex-1 max-w-md relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search activities..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10"
-            />
+          {/* View Mode Switcher */}
+          <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+            {(['day', 'month', 'year'] as ViewMode[]).map((mode) => {
+              const Icon = viewModeIcons[mode];
+              return (
+                <Button
+                  key={mode}
+                  variant={viewMode === mode ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => onViewModeChange(mode)}
+                  className="h-8 px-3 capitalize"
+                >
+                  <Icon className="h-4 w-4 mr-1" />
+                  {mode}
+                </Button>
+              );
+            })}
           </div>
+
+          {/* Search Bar - only show in day view */}
+          {viewMode === 'day' && (
+            <div className="flex-1 max-w-md relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search activities..."
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          )}
 
           {/* Filters and Theme Toggle */}
           <div className="flex items-center gap-2">
-            <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
-              <SelectTrigger className="w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All">All</SelectItem>
-                <SelectItem value="Work">Work</SelectItem>
-                <SelectItem value="Leisure">Leisure</SelectItem>
-                <SelectItem value="Event">Event</SelectItem>
-              </SelectContent>
-            </Select>
+            {viewMode === 'day' && (
+              <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All</SelectItem>
+                  <SelectItem value="Work">Work</SelectItem>
+                  <SelectItem value="Leisure">Leisure</SelectItem>
+                  <SelectItem value="Event">Event</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
 
             <Button
               variant="outline"
@@ -153,13 +207,9 @@ export function Header({
                 <ChevronLeft className="h-3 w-3" />
               </Button>
               
-              <div className="flex flex-col items-center min-w-[120px]">
+              <div className="flex flex-col items-center min-w-[140px]">
                 <div className="font-bold text-sm text-foreground">
-                  {selectedDateObj.toLocaleDateString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric',
-                  })}
+                  {getDateDisplay()}
                 </div>
                 {!isToday && (
                   <Button
@@ -171,7 +221,7 @@ export function Header({
                     Today
                   </Button>
                 )}
-                {isToday && (
+                {isToday && viewMode === 'day' && (
                   <span className="text-xs text-primary font-medium">Today</span>
                 )}
               </div>
@@ -200,30 +250,53 @@ export function Header({
             </Button>
           </div>
 
-          {/* Bottom Row: Search and Filter */}
-          <div className="flex gap-2">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
-                className="pl-10"
-              />
+          {/* View Mode Switcher */}
+          <div className="flex items-center justify-center">
+            <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+              {(['day', 'month', 'year'] as ViewMode[]).map((mode) => {
+                const Icon = viewModeIcons[mode];
+                return (
+                  <Button
+                    key={mode}
+                    variant={viewMode === mode ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => onViewModeChange(mode)}
+                    className="h-8 px-2 text-xs"
+                  >
+                    <Icon className="h-3 w-3 mr-1" />
+                    {mode}
+                  </Button>
+                );
+              })}
             </div>
-            
-            <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
-              <SelectTrigger className="w-24">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All">All</SelectItem>
-                <SelectItem value="Work">Work</SelectItem>
-                <SelectItem value="Leisure">Leisure</SelectItem>
-                <SelectItem value="Event">Event</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
+
+          {/* Search and Filter - only show in day view */}
+          {viewMode === 'day' && (
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => onSearchChange(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              
+              <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
+                <SelectTrigger className="w-24">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All</SelectItem>
+                  <SelectItem value="Work">Work</SelectItem>
+                  <SelectItem value="Leisure">Leisure</SelectItem>
+                  <SelectItem value="Event">Event</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
       </div>
     </motion.header>
