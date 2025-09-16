@@ -51,9 +51,13 @@ export function YearView({ selectedDate, onDateClick, onViewChange, searchQuery,
 
   const scrollToCurrentMonth = () => {
     if (currentMonthRef.current) {
-      currentMonthRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
+      // Use requestAnimationFrame to ensure the element is rendered
+      requestAnimationFrame(() => {
+        currentMonthRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'nearest'
+        });
       });
     }
   };
@@ -63,7 +67,7 @@ export function YearView({ selectedDate, onDateClick, onViewChange, searchQuery,
       // Register the scroll function
       onScrollToCurrentMonth.current = scrollToCurrentMonth;
     }
-  }, [onScrollToCurrentMonth, scrollToCurrentMonth]);
+  }, []);
 
   return (
     <motion.div

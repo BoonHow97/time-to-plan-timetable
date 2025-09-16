@@ -80,10 +80,10 @@ const Index = () => {
 
   const handleGoToToday = () => {
     if (viewMode === 'year' && yearScrollRef.current) {
-      // Small delay to ensure the date change has been processed
+      // Longer delay to ensure the date change and component render
       setTimeout(() => {
         yearScrollRef.current?.();
-      }, 100);
+      }, 300);
     }
   };
 
