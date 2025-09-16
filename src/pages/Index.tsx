@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+
 import { Activity, FilterCategory, ViewMode } from '@/types';
 import { useTheme } from '@/hooks/useTheme';
 import { useActivities } from '@/hooks/useActivities';
@@ -109,16 +109,8 @@ const Index = () => {
       />
 
       <main className="container mx-auto px-4 py-8 pb-24 max-w-6xl">
-        <AnimatePresence mode="wait">
           {viewMode === 'day' && (
-            <motion.div
-              key="day-view"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-8"
-            >
+            <div className="space-y-8">
               <TimelineSection
                 activities={filteredTimelineItems}
                 onEdit={handleEditActivity}
@@ -133,7 +125,7 @@ const Index = () => {
                 onToggleComplete={toggleTaskCompletion}
                 currentDate={selectedDate}
               />
-            </motion.div>
+            </div>
           )}
           
           {viewMode === 'month' && (
@@ -158,7 +150,6 @@ const Index = () => {
               onScrollToCurrentMonth={yearScrollRef}
             />
           )}
-        </AnimatePresence>
       </main>
 
       {/* Only show Add Activity Form in day view */}
