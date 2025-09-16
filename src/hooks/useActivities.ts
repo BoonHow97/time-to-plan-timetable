@@ -79,24 +79,115 @@ export function useActivities(selectedDate: string) {
   };
 
   const addActivity = (activity: Omit<Activity, 'id' | 'date'>) => {
+    const activityId = Date.now().toString();
     const newActivity: Activity = {
       ...activity,
-      id: Date.now().toString(),
+      id: activityId,
       date: selectedDate,
     };
-    saveActivities([...activities, newActivity]);
+    
+    // If activity has an end date, create copies for each day in the range
+    if (activity.endDate && activity.endDate !== selectedDate) {
+      const startDate = new Date(selectedDate);
+      const endDate = new Date(activity.endDate);
+      
+      // Store on all days between start and end (inclusive)
+      let currentDate = new Date(startDate);
+      while (currentDate <= endDate) {
+        const dateKey = currentDate.toISOString().split('T')[0];
+        const storageKey = `activities-${dateKey}`;
+        const existingActivities = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        
+        const activityForDate = {
+          ...newActivity,
+          date: dateKey,
+        };
+        
+        // Update activities for this date
+        const updatedActivities = [...existingActivities, activityForDate];
+        localStorage.setItem(storageKey, JSON.stringify(updatedActivities));
+        
+        // If this is the selected date, update state too
+        if (dateKey === selectedDate) {
+          setActivities(updatedActivities);
+        }
+        
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    } else {
+      // Single day activity
+      saveActivities([...activities, newActivity]);
+    }
   };
 
   const updateActivity = (id: string, updates: Partial<Activity>) => {
-    const updated = activities.map(activity =>
-      activity.id === id ? { ...activity, ...updates } : activity
-    );
-    saveActivities(updated);
+    const activityToUpdate = activities.find(a => a.id === id);
+    if (!activityToUpdate) return;
+    
+    // If this is a multi-day activity, update it across all affected days
+    if (activityToUpdate.endDate && activityToUpdate.endDate !== activityToUpdate.date) {
+      const startDate = new Date(activityToUpdate.date);
+      const endDate = new Date(activityToUpdate.endDate);
+      
+      // Update on all days between start and end (inclusive)
+      let currentDate = new Date(startDate);
+      while (currentDate <= endDate) {
+        const dateKey = currentDate.toISOString().split('T')[0];
+        const storageKey = `activities-${dateKey}`;
+        const existingActivities = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        
+        const updatedActivities = existingActivities.map((activity: Activity) =>
+          activity.id === id ? { ...activity, ...updates } : activity
+        );
+        localStorage.setItem(storageKey, JSON.stringify(updatedActivities));
+        
+        // If this is the selected date, update state too
+        if (dateKey === selectedDate) {
+          setActivities(updatedActivities);
+        }
+        
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    } else {
+      // Single day activity
+      const updated = activities.map(activity =>
+        activity.id === id ? { ...activity, ...updates } : activity
+      );
+      saveActivities(updated);
+    }
   };
 
   const deleteActivity = (id: string) => {
-    const filtered = activities.filter(activity => activity.id !== id);
-    saveActivities(filtered);
+    const activityToDelete = activities.find(a => a.id === id);
+    if (!activityToDelete) return;
+    
+    // If this is a multi-day activity, delete it from all affected days
+    if (activityToDelete.endDate && activityToDelete.endDate !== activityToDelete.date) {
+      const startDate = new Date(activityToDelete.date);
+      const endDate = new Date(activityToDelete.endDate);
+      
+      // Delete from all days between start and end (inclusive)
+      let currentDate = new Date(startDate);
+      while (currentDate <= endDate) {
+        const dateKey = currentDate.toISOString().split('T')[0];
+        const storageKey = `activities-${dateKey}`;
+        const existingActivities = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        
+        const filteredActivities = existingActivities.filter((activity: Activity) => activity.id !== id);
+        localStorage.setItem(storageKey, JSON.stringify(filteredActivities));
+        
+        // If this is the selected date, update state too
+        if (dateKey === selectedDate) {
+          setActivities(filteredActivities);
+        }
+        
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    } else {
+      // Single day activity
+      const filtered = activities.filter(activity => activity.id !== id);
+      saveActivities(filtered);
+    }
   };
 
   const toggleTaskCompletion = (id: string) => {
