@@ -1,11 +1,18 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Calendar as CalendarIcon, Clock } from 'lucide-react';
+import { format } from 'date-fns';
 import { Activity, Category } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -13,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 interface AddActivityFormProps {
   onAdd: (activity: Omit<Activity, 'id' | 'date'>) => void;
@@ -29,18 +37,42 @@ export function AddActivityForm({
 }: AddActivityFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState('');
-  const [time, setTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDateTime, setStartDateTime] = useState<Date | undefined>(undefined);
+  const [endDateTime, setEndDateTime] = useState<Date | undefined>(undefined);
   const [category, setCategory] = useState<Category>('Work');
 
   useEffect(() => {
     if (editingActivity) {
       setIsOpen(true);
       setName(editingActivity.name);
-      setTime(editingActivity.time || '');
-      setEndTime(editingActivity.endTime || '');
-      setEndDate(editingActivity.endDate || '');
+      
+      // Parse start date/time
+      if (editingActivity.time) {
+        const startDate = new Date(editingActivity.date);
+        const [hours, minutes] = editingActivity.time.split(':');
+        startDate.setHours(parseInt(hours), parseInt(minutes));
+        setStartDateTime(startDate);
+      } else {
+        setStartDateTime(undefined);
+      }
+      
+      // Parse end date/time
+      if (editingActivity.endDate) {
+        const endDate = new Date(editingActivity.endDate);
+        if (editingActivity.endTime) {
+          const [hours, minutes] = editingActivity.endTime.split(':');
+          endDate.setHours(parseInt(hours), parseInt(minutes));
+        }
+        setEndDateTime(endDate);
+      } else if (editingActivity.endTime && startDateTime) {
+        const endDate = new Date(editingActivity.date);
+        const [hours, minutes] = editingActivity.endTime.split(':');
+        endDate.setHours(parseInt(hours), parseInt(minutes));
+        setEndDateTime(endDate);
+      } else {
+        setEndDateTime(undefined);
+      }
+      
       setCategory(editingActivity.category);
     }
   }, [editingActivity]);
@@ -52,10 +84,10 @@ export function AddActivityForm({
     const activityData = {
       name: name.trim(),
       category,
-      time: time || undefined,
-      endTime: endTime || undefined,
-      endDate: endDate || undefined,
-      completed: time ? undefined : false,
+      time: startDateTime ? format(startDateTime, 'HH:mm') : undefined,
+      endTime: endDateTime ? format(endDateTime, 'HH:mm') : undefined,
+      endDate: endDateTime ? format(endDateTime, 'yyyy-MM-dd') : undefined,
+      completed: startDateTime ? undefined : false,
     };
 
     if (editingActivity && onUpdate) {
@@ -67,18 +99,16 @@ export function AddActivityForm({
 
     // Reset form
     setName('');
-    setTime('');
-    setEndTime('');
-    setEndDate('');
+    setStartDateTime(undefined);
+    setEndDateTime(undefined);
     setCategory('Work');
     setIsOpen(false);
   };
 
   const handleCancel = () => {
     setName('');
-    setTime('');
-    setEndTime('');
-    setEndDate('');
+    setStartDateTime(undefined);
+    setEndDateTime(undefined);
     setCategory('Work');
     setIsOpen(false);
     onCancelEdit?.();
@@ -126,36 +156,139 @@ export function AddActivityForm({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="activity-time">Start Time (Optional)</Label>
-                    <Input
-                      id="activity-time"
-                      type="time"
-                      value={time}
-                      onChange={(e) => setTime(e.target.value)}
-                      className="w-full"
-                    />
+                    <Label>Start Date & Time (Optional)</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !startDateTime && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {startDateTime ? (
+                            format(startDateTime, "PPP 'at' HH:mm")
+                          ) : (
+                            <span>Pick start date and time</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={startDateTime}
+                          onSelect={(date) => {
+                            if (date) {
+                              // If there's an existing time, preserve it
+                              if (startDateTime) {
+                                const newDate = new Date(date);
+                                newDate.setHours(startDateTime.getHours(), startDateTime.getMinutes());
+                                setStartDateTime(newDate);
+                              } else {
+                                // Default to current time
+                                const now = new Date();
+                                date.setHours(now.getHours(), now.getMinutes());
+                                setStartDateTime(date);
+                              }
+                            } else {
+                              setStartDateTime(undefined);
+                            }
+                          }}
+                          initialFocus
+                          className="p-3 pointer-events-auto"
+                        />
+                        {startDateTime && (
+                          <div className="p-3 border-t">
+                            <Label htmlFor="start-time" className="text-sm font-medium">
+                              Time
+                            </Label>
+                            <Input
+                              id="start-time"
+                              type="time"
+                              value={format(startDateTime, 'HH:mm')}
+                              onChange={(e) => {
+                                if (e.target.value && startDateTime) {
+                                  const [hours, minutes] = e.target.value.split(':');
+                                  const newDateTime = new Date(startDateTime);
+                                  newDateTime.setHours(parseInt(hours), parseInt(minutes));
+                                  setStartDateTime(newDateTime);
+                                }
+                              }}
+                              className="mt-1"
+                            />
+                          </div>
+                        )}
+                      </PopoverContent>
+                    </Popover>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="activity-end-time">End Time (Optional)</Label>
-                    <Input
-                      id="activity-end-time"
-                      type="time"
-                      value={endTime}
-                      onChange={(e) => setEndTime(e.target.value)}
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="activity-end-date">End Date (Optional)</Label>
-                    <Input
-                      id="activity-end-date"
-                      type="date"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full"
-                    />
+                    <Label>End Date & Time (Optional)</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !endDateTime && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {endDateTime ? (
+                            format(endDateTime, "PPP 'at' HH:mm")
+                          ) : (
+                            <span>Pick end date and time</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={endDateTime}
+                          onSelect={(date) => {
+                            if (date) {
+                              // If there's an existing time, preserve it
+                              if (endDateTime) {
+                                const newDate = new Date(date);
+                                newDate.setHours(endDateTime.getHours(), endDateTime.getMinutes());
+                                setEndDateTime(newDate);
+                              } else {
+                                // Default to 1 hour after start time, or current time + 1 hour
+                                const baseTime = startDateTime || new Date();
+                                date.setHours(baseTime.getHours() + 1, baseTime.getMinutes());
+                                setEndDateTime(date);
+                              }
+                            } else {
+                              setEndDateTime(undefined);
+                            }
+                          }}
+                          initialFocus
+                          className="p-3 pointer-events-auto"
+                        />
+                        {endDateTime && (
+                          <div className="p-3 border-t">
+                            <Label htmlFor="end-time" className="text-sm font-medium">
+                              Time
+                            </Label>
+                            <Input
+                              id="end-time"
+                              type="time"
+                              value={format(endDateTime, 'HH:mm')}
+                              onChange={(e) => {
+                                if (e.target.value && endDateTime) {
+                                  const [hours, minutes] = e.target.value.split(':');
+                                  const newDateTime = new Date(endDateTime);
+                                  newDateTime.setHours(parseInt(hours), parseInt(minutes));
+                                  setEndDateTime(newDateTime);
+                                }
+                              }}
+                              className="mt-1"
+                            />
+                          </div>
+                        )}
+                      </PopoverContent>
+                    </Popover>
                     <p className="text-xs text-muted-foreground">
                       Leave start time empty to add to to-do list
                     </p>
