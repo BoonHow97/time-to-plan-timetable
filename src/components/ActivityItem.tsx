@@ -46,12 +46,34 @@ export function ActivityItem({
           )}
           
           {showTime && activity.time && (
-            <div className="text-sm font-bold text-foreground min-w-[60px]">
-              {new Date(`2000-01-01T${activity.time}`).toLocaleTimeString([], {
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true,
-              })}
+            <div className="flex flex-col min-w-[80px]">
+              <div className="text-sm font-bold text-foreground">
+                {new Date(`2000-01-01T${activity.time}`).toLocaleTimeString([], {
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  hour12: true,
+                })}
+              </div>
+              {(activity.endTime || activity.endDate) && (
+                <div className="text-xs text-muted-foreground">
+                  to{' '}
+                  {activity.endTime && 
+                    new Date(`2000-01-01T${activity.endTime}`).toLocaleTimeString([], {
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true,
+                    })
+                  }
+                  {activity.endDate && activity.endDate !== activity.date && (
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {new Date(activity.endDate).toLocaleDateString([], {
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
           

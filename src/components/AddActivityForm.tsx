@@ -129,19 +129,9 @@ export function AddActivityForm({
     return d;
   };
 
-  // Generate time options in 5-minute intervals
-  const generateTimeOptions = () => {
-    const options = [];
-    for (let hour = 0; hour < 24; hour++) {
-      for (let minute = 0; minute < 60; minute += 5) {
-        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-        options.push(timeString);
-      }
-    }
-    return options;
-  };
-
-  const timeOptions = generateTimeOptions();
+  // Generate hour and minute options
+  const hourOptions = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
+  const minuteOptions = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'];
 
 
   return (
@@ -243,32 +233,62 @@ export function AddActivityForm({
                           className="p-3 pointer-events-auto"
                         />
                         {startDateTime && (
-                          <div className="p-3 border-t">
-                            <Label htmlFor="start-time" className="text-sm font-medium">
-                              Time
-                            </Label>
-                            <Select
-                              value={format(startDateTime, 'HH:mm')}
-                              onValueChange={(value) => {
-                                if (value && startDateTime) {
-                                  const [hours, minutes] = value.split(':');
-                                  const newDateTime = new Date(startDateTime);
-                                  newDateTime.setHours(parseInt(hours), parseInt(minutes));
-                                  setStartDateTime(newDateTime);
-                                }
-                              }}
-                            >
-                              <SelectTrigger className="mt-1">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {timeOptions.map((time) => (
-                                  <SelectItem key={time} value={time}>
-                                    {time}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                          <div className="p-3 border-t space-y-3">
+                            <Label className="text-sm font-medium">Time</Label>
+                            <div className="flex gap-2">
+                              <div className="flex-1">
+                                <Label htmlFor="start-hour" className="text-xs text-muted-foreground">
+                                  Hour
+                                </Label>
+                                <Select
+                                  value={format(startDateTime, 'HH')}
+                                  onValueChange={(hour) => {
+                                    if (hour && startDateTime) {
+                                      const newDateTime = new Date(startDateTime);
+                                      newDateTime.setHours(parseInt(hour));
+                                      setStartDateTime(newDateTime);
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {hourOptions.map((hour) => (
+                                      <SelectItem key={hour} value={hour}>
+                                        {hour}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="flex-1">
+                                <Label htmlFor="start-minute" className="text-xs text-muted-foreground">
+                                  Minute
+                                </Label>
+                                <Select
+                                  value={format(startDateTime, 'mm')}
+                                  onValueChange={(minute) => {
+                                    if (minute && startDateTime) {
+                                      const newDateTime = new Date(startDateTime);
+                                      newDateTime.setMinutes(parseInt(minute));
+                                      setStartDateTime(newDateTime);
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {minuteOptions.map((minute) => (
+                                      <SelectItem key={minute} value={minute}>
+                                        {minute}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
                           </div>
                         )}
                       </PopoverContent>
@@ -319,32 +339,62 @@ export function AddActivityForm({
                           className="p-3 pointer-events-auto"
                         />
                         {endDateTime && (
-                          <div className="p-3 border-t">
-                            <Label htmlFor="end-time" className="text-sm font-medium">
-                              Time
-                            </Label>
-                            <Select
-                              value={format(endDateTime, 'HH:mm')}
-                              onValueChange={(value) => {
-                                if (value && endDateTime) {
-                                  const [hours, minutes] = value.split(':');
-                                  const newDateTime = new Date(endDateTime);
-                                  newDateTime.setHours(parseInt(hours), parseInt(minutes));
-                                  setEndDateTime(newDateTime);
-                                }
-                              }}
-                            >
-                              <SelectTrigger className="mt-1">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {timeOptions.map((time) => (
-                                  <SelectItem key={time} value={time}>
-                                    {time}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                          <div className="p-3 border-t space-y-3">
+                            <Label className="text-sm font-medium">Time</Label>
+                            <div className="flex gap-2">
+                              <div className="flex-1">
+                                <Label htmlFor="end-hour" className="text-xs text-muted-foreground">
+                                  Hour
+                                </Label>
+                                <Select
+                                  value={format(endDateTime, 'HH')}
+                                  onValueChange={(hour) => {
+                                    if (hour && endDateTime) {
+                                      const newDateTime = new Date(endDateTime);
+                                      newDateTime.setHours(parseInt(hour));
+                                      setEndDateTime(newDateTime);
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {hourOptions.map((hour) => (
+                                      <SelectItem key={hour} value={hour}>
+                                        {hour}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="flex-1">
+                                <Label htmlFor="end-minute" className="text-xs text-muted-foreground">
+                                  Minute
+                                </Label>
+                                <Select
+                                  value={format(endDateTime, 'mm')}
+                                  onValueChange={(minute) => {
+                                    if (minute && endDateTime) {
+                                      const newDateTime = new Date(endDateTime);
+                                      newDateTime.setMinutes(parseInt(minute));
+                                      setEndDateTime(newDateTime);
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {minuteOptions.map((minute) => (
+                                      <SelectItem key={minute} value={minute}>
+                                        {minute}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
                           </div>
                         )}
                       </PopoverContent>
