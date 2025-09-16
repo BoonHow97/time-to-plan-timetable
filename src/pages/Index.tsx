@@ -1,11 +1,14 @@
 import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { Activity, FilterCategory } from '@/types';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Activity, FilterCategory, ViewMode } from '@/types';
 import { useTheme } from '@/hooks/useTheme';
 import { useActivities } from '@/hooks/useActivities';
+import { useCalendarData } from '@/hooks/useCalendarData';
 import { Header } from '@/components/Header';
 import { TimelineSection } from '@/components/TimelineSection';
 import { TodoSection } from '@/components/TodoSection';
+import { MonthView } from '@/components/MonthView';
+import { YearView } from '@/components/YearView';
 import { AddActivityForm } from '@/components/AddActivityForm';
 
 const Index = () => {
@@ -16,6 +19,9 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<FilterCategory>('All');
   const [editingActivity, setEditingActivity] = useState<Activity | undefined>();
+  const [viewMode, setViewMode] = useState<ViewMode>('day');
+
+  const { refreshData } = useCalendarData();
 
   const {
     timelineItems,
@@ -26,7 +32,7 @@ const Index = () => {
     toggleTaskCompletion,
   } = useActivities(selectedDate);
 
-  // Filter activities based on search and category
+  // Filter activities based on search and category (only for day view)
   const filteredTimelineItems = useMemo(() => {
     return timelineItems.filter(activity => {
       const matchesSearch = activity.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -50,10 +56,34 @@ const Index = () => {
   const handleUpdateActivity = (id: string, updates: Partial<Activity>) => {
     updateActivity(id, updates);
     setEditingActivity(undefined);
+    refreshData(); // Refresh calendar data when activity is updated
   };
 
   const handleCancelEdit = () => {
     setEditingActivity(undefined);
+  };
+
+  const handleAddActivity = (activity: Omit<Activity, 'id' | 'date'>) => {
+    addActivity(activity);
+    refreshData(); // Refresh calendar data when activity is added
+  };
+
+  const handleDeleteActivity = (id: string) => {
+    deleteActivity(id);
+    refreshData(); // Refresh calendar data when activity is deleted
+  };
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    // Clear search and filters when switching away from day view
+    if (mode !== 'day') {
+      setSearchQuery('');
+      setCategoryFilter('All');
+    }
+  };
+
+  const handleDateClick = (date: string) => {
+    setSelectedDate(date);
   };
 
   return (
@@ -67,36 +97,65 @@ const Index = () => {
         onCategoryFilterChange={setCategoryFilter}
         isDarkMode={isDarkMode}
         onToggleTheme={toggleTheme}
+        viewMode={viewMode}
+        onViewModeChange={handleViewModeChange}
       />
 
-      <main className="container mx-auto px-4 py-8 pb-24 max-w-4xl">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="space-y-8"
-        >
-          <TimelineSection
-            activities={filteredTimelineItems}
-            onEdit={handleEditActivity}
-            onDelete={deleteActivity}
-          />
+      <main className="container mx-auto px-4 py-8 pb-24 max-w-6xl">
+        <AnimatePresence mode="wait">
+          {viewMode === 'day' && (
+            <motion.div
+              key="day-view"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-8"
+            >
+              <TimelineSection
+                activities={filteredTimelineItems}
+                onEdit={handleEditActivity}
+                onDelete={handleDeleteActivity}
+              />
 
-          <TodoSection
-            activities={filteredTodoItems}
-            onEdit={handleEditActivity}
-            onDelete={deleteActivity}
-            onToggleComplete={toggleTaskCompletion}
-          />
-        </motion.div>
+              <TodoSection
+                activities={filteredTodoItems}
+                onEdit={handleEditActivity}
+                onDelete={handleDeleteActivity}
+                onToggleComplete={toggleTaskCompletion}
+              />
+            </motion.div>
+          )}
+          
+          {viewMode === 'month' && (
+            <MonthView
+              key="month-view"
+              selectedDate={selectedDate}
+              onDateClick={handleDateClick}
+              onViewChange={setViewMode}
+            />
+          )}
+          
+          {viewMode === 'year' && (
+            <YearView
+              key="year-view"
+              selectedDate={selectedDate}
+              onDateClick={handleDateClick}
+              onViewChange={setViewMode}
+            />
+          )}
+        </AnimatePresence>
       </main>
 
-      <AddActivityForm
-        onAdd={addActivity}
-        onUpdate={handleUpdateActivity}
-        editingActivity={editingActivity}
-        onCancelEdit={handleCancelEdit}
-      />
+      {/* Only show Add Activity Form in day view */}
+      {viewMode === 'day' && (
+        <AddActivityForm
+          onAdd={handleAddActivity}
+          onUpdate={handleUpdateActivity}
+          editingActivity={editingActivity}
+          onCancelEdit={handleCancelEdit}
+        />
+      )}
     </div>
   );
 };
