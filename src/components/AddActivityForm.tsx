@@ -129,6 +129,20 @@ export function AddActivityForm({
     return d;
   };
 
+  // Generate time options in 5-minute intervals
+  const generateTimeOptions = () => {
+    const options = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 5) {
+        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        options.push(timeString);
+      }
+    }
+    return options;
+  };
+
+  const timeOptions = generateTimeOptions();
+
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
@@ -233,21 +247,28 @@ export function AddActivityForm({
                             <Label htmlFor="start-time" className="text-sm font-medium">
                               Time
                             </Label>
-                            <Input
-                              id="start-time"
-                              type="time"
-                              step="300"
+                            <Select
                               value={format(startDateTime, 'HH:mm')}
-                              onChange={(e) => {
-                                if (e.target.value && startDateTime) {
-                                  const [hours, minutes] = e.target.value.split(':');
+                              onValueChange={(value) => {
+                                if (value && startDateTime) {
+                                  const [hours, minutes] = value.split(':');
                                   const newDateTime = new Date(startDateTime);
                                   newDateTime.setHours(parseInt(hours), parseInt(minutes));
-                                  setStartDateTime(roundToNearestFiveMinutes(newDateTime));
+                                  setStartDateTime(newDateTime);
                                 }
                               }}
-                              className="mt-1"
-                            />
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {timeOptions.map((time) => (
+                                  <SelectItem key={time} value={time}>
+                                    {time}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
                         )}
                       </PopoverContent>
@@ -302,21 +323,28 @@ export function AddActivityForm({
                             <Label htmlFor="end-time" className="text-sm font-medium">
                               Time
                             </Label>
-                            <Input
-                              id="end-time"
-                              type="time"
-                              step="300"
+                            <Select
                               value={format(endDateTime, 'HH:mm')}
-                              onChange={(e) => {
-                                if (e.target.value && endDateTime) {
-                                  const [hours, minutes] = e.target.value.split(':');
+                              onValueChange={(value) => {
+                                if (value && endDateTime) {
+                                  const [hours, minutes] = value.split(':');
                                   const newDateTime = new Date(endDateTime);
                                   newDateTime.setHours(parseInt(hours), parseInt(minutes));
-                                  setEndDateTime(roundToNearestFiveMinutes(newDateTime));
+                                  setEndDateTime(newDateTime);
                                 }
                               }}
-                              className="mt-1"
-                            />
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {timeOptions.map((time) => (
+                                  <SelectItem key={time} value={time}>
+                                    {time}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
                         )}
                       </PopoverContent>
