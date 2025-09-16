@@ -8,6 +8,7 @@ interface TodoSectionProps {
   onEdit: (activity: Activity) => void;
   onDelete: (id: string) => void;
   onToggleComplete: (id: string) => void;
+  currentDate: string;
 }
 
 export function TodoSection({
@@ -15,6 +16,7 @@ export function TodoSection({
   onEdit,
   onDelete,
   onToggleComplete,
+  currentDate,
 }: TodoSectionProps) {
   const completedCount = activities.filter(a => a.completed).length;
   const totalCount = activities.length;
@@ -55,14 +57,15 @@ export function TodoSection({
         ) : (
           <div className="space-y-3">
             {activities.map((activity) => (
-              <ActivityItem
-                key={activity.id}
-                activity={activity}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                onToggleComplete={onToggleComplete}
-                showTime={false}
-              />
+                <ActivityItem
+                  key={activity.id}
+                  activity={activity}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  onToggleComplete={onToggleComplete}
+                  showTime={false}
+                  currentDate={currentDate}
+                />
             ))}
           </div>
         )}

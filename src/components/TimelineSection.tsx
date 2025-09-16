@@ -7,9 +7,10 @@ interface TimelineSectionProps {
   activities: Activity[];
   onEdit: (activity: Activity) => void;
   onDelete: (id: string) => void;
+  currentDate: string;
 }
 
-export function TimelineSection({ activities, onEdit, onDelete }: TimelineSectionProps) {
+export function TimelineSection({ activities, onEdit, onDelete, currentDate }: TimelineSectionProps) {
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
@@ -46,13 +47,14 @@ export function TimelineSection({ activities, onEdit, onDelete }: TimelineSectio
         ) : (
           <div className="space-y-3">
             {activities.map((activity) => (
-              <ActivityItem
-                key={activity.id}
-                activity={activity}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                showTime={true}
-              />
+                <ActivityItem
+                  key={activity.id}
+                  activity={activity}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  showTime={true}
+                  currentDate={currentDate}
+                />
             ))}
           </div>
         )}
