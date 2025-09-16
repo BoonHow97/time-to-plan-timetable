@@ -12,6 +12,7 @@ interface SearchDropdownProps {
   activities: Activity[];
   categoryFilter: FilterCategory;
   onActivityClick: (date: string) => void;
+  onViewModeChange?: (mode: 'day') => void;
   placeholder?: string;
 }
 
@@ -21,6 +22,7 @@ export function SearchDropdown({
   activities,
   categoryFilter,
   onActivityClick,
+  onViewModeChange,
   placeholder = "Search activities..."
 }: SearchDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -62,7 +64,10 @@ export function SearchDropdown({
   };
 
   const handleActivityClick = (activity: Activity) => {
+    // Always go to the start date for activities (even if they span multiple days)
     onActivityClick(activity.date);
+    // Switch to day view
+    onViewModeChange?.('day');
     setIsOpen(false);
     inputRef.current?.blur();
   };
