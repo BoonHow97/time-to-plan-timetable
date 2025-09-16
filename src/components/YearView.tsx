@@ -55,7 +55,7 @@ export function YearView({ selectedDate, onDateClick, onViewChange, searchQuery,
       requestAnimationFrame(() => {
         currentMonthRef.current?.scrollIntoView({
           behavior: 'smooth',
-          block: 'start',
+          block: 'center',
           inline: 'nearest'
         });
       });
