@@ -23,8 +23,9 @@ export function ActivityItem({
   currentDate,
 }: ActivityItemProps) {
   const isCompleted = activity.completed === true;
-  const isMultiDay = activity.endDate && activity.endDate !== activity.date;
-  const isStartDate = !currentDate || currentDate === activity.date;
+  const startDate = activity.startDate ?? activity.date;
+  const isMultiDay = activity.endDate && activity.endDate !== startDate;
+  const isStartDate = !currentDate || currentDate === startDate;
   
   return (
     <div
@@ -56,7 +57,7 @@ export function ActivityItem({
                 </div>
               ) : isMultiDay ? (
                 <div className="text-sm font-bold text-foreground">
-                  {new Date(activity.date).toLocaleDateString([], {
+                  {new Date(startDate).toLocaleDateString([], {
                     month: 'short',
                     day: 'numeric',
                   })}
@@ -78,6 +79,17 @@ export function ActivityItem({
                       })}
                     </div>
                   )}
+                </div>
+              )}
+
+              {!isMultiDay && activity.endTime && (
+                <div className="text-xs text-muted-foreground">
+                  to{' '}
+                  {new Date(`2000-01-01T${activity.endTime}`).toLocaleTimeString([], {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                  })}
                 </div>
               )}
             </div>

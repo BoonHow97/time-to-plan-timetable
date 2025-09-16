@@ -84,6 +84,7 @@ export function useActivities(selectedDate: string) {
       ...activity,
       id: activityId,
       date: selectedDate,
+      startDate: selectedDate,
     };
     
     // If activity has an end date, create copies for each day in the range
@@ -126,7 +127,7 @@ export function useActivities(selectedDate: string) {
     
     // If this is a multi-day activity, update it across all affected days
     if (activityToUpdate.endDate && activityToUpdate.endDate !== activityToUpdate.date) {
-      const startDate = new Date(activityToUpdate.date);
+      const startDate = new Date(activityToUpdate.startDate ?? activityToUpdate.date);
       const endDate = new Date(activityToUpdate.endDate);
       
       // Update on all days between start and end (inclusive)
@@ -163,7 +164,7 @@ export function useActivities(selectedDate: string) {
     
     // If this is a multi-day activity, delete it from all affected days
     if (activityToDelete.endDate && activityToDelete.endDate !== activityToDelete.date) {
-      const startDate = new Date(activityToDelete.date);
+      const startDate = new Date(activityToDelete.startDate ?? activityToDelete.date);
       const endDate = new Date(activityToDelete.endDate);
       
       // Delete from all days between start and end (inclusive)

@@ -10,6 +10,7 @@ export interface Activity {
   endDate?: string; // Optional end date (YYYY-MM-DD format)
   completed?: boolean; // For to-do items
   date: string; // YYYY-MM-DD format
+  startDate?: string; // Original start date for multi-day activities
   description?: string; // Optional description
 }
 
