@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Activity } from '@/types';
 import { CategoryBadge } from './CategoryBadge';
-import { cn } from '@/lib/utils';
+import { cn, formatLocalDate } from '@/lib/utils';
 
 interface CalendarGridProps {
   year: number;
@@ -35,7 +35,7 @@ export function CalendarGrid({
   }
 
   const today = new Date();
-  const todayString = today.toISOString().split('T')[0];
+  const todayString = formatLocalDate(today);
 
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -63,7 +63,7 @@ export function CalendarGrid({
       {/* Calendar Days */}
       <div className="grid grid-cols-7">
         {days.map((day, index) => {
-          const dateString = day.toISOString().split('T')[0];
+          const dateString = formatLocalDate(day);
           const dayActivities = activities[dateString] || [];
           const isCurrentMonth = day.getMonth() === month;
           const isToday = dateString === todayString;

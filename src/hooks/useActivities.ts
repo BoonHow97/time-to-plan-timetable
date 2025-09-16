@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Activity } from '@/types';
+import { formatLocalDate } from '@/lib/utils';
 
 // Example data
 const getExampleActivities = (date: string): Activity[] => [
@@ -59,7 +60,7 @@ export function useActivities(selectedDate: string) {
       setActivities(JSON.parse(saved));
     } else {
       // Load example data for today only
-      const today = new Date().toISOString().split('T')[0];
+      const today = formatLocalDate(new Date());
       if (selectedDate === today) {
         const exampleData = getExampleActivities(selectedDate);
         setActivities(exampleData);
