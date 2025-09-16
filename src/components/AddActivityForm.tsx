@@ -169,7 +169,7 @@ export function AddActivityForm({
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent side="top">
                         <SelectItem value="Work">Work</SelectItem>
                         <SelectItem value="Leisure">Leisure</SelectItem>
                         <SelectItem value="Event">Event</SelectItem>
@@ -208,7 +208,7 @@ export function AddActivityForm({
                           )}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0" align="start" side="top" sideOffset={5}>
                         <Calendar
                           mode="single"
                           selected={startDateTime}
@@ -253,7 +253,7 @@ export function AddActivityForm({
                                   <SelectTrigger>
                                     <SelectValue />
                                   </SelectTrigger>
-                                  <SelectContent>
+                                  <SelectContent side="top">
                                     {hourOptions.map((hour) => (
                                       <SelectItem key={hour} value={hour}>
                                         {hour}
@@ -279,7 +279,7 @@ export function AddActivityForm({
                                   <SelectTrigger>
                                     <SelectValue />
                                   </SelectTrigger>
-                                  <SelectContent>
+                                  <SelectContent side="top">
                                     {minuteOptions.map((minute) => (
                                       <SelectItem key={minute} value={minute}>
                                         {minute}
@@ -314,7 +314,7 @@ export function AddActivityForm({
                           )}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0" align="start" side="top" sideOffset={5}>
                         <Calendar
                           mode="single"
                           selected={endDateTime}
@@ -359,7 +359,7 @@ export function AddActivityForm({
                                   <SelectTrigger>
                                     <SelectValue />
                                   </SelectTrigger>
-                                  <SelectContent>
+                                  <SelectContent side="top">
                                     {hourOptions.map((hour) => (
                                       <SelectItem key={hour} value={hour}>
                                         {hour}
@@ -385,7 +385,7 @@ export function AddActivityForm({
                                   <SelectTrigger>
                                     <SelectValue />
                                   </SelectTrigger>
-                                  <SelectContent>
+                                  <SelectContent side="top">
                                     {minuteOptions.map((minute) => (
                                       <SelectItem key={minute} value={minute}>
                                         {minute}
