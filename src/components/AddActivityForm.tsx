@@ -213,7 +213,8 @@ export function AddActivityForm({
                       <PopoverContent className="w-auto p-0" align="start" side="top" sideOffset={5}>
                         <Calendar
                           mode="single"
-                          selected={startDateTime}
+                          selected={startDateTime ?? new Date(selectedDate)}
+                          defaultMonth={new Date(selectedDate)}
                               onSelect={(date) => {
                                 if (date) {
                                   // If there's an existing time, preserve it
@@ -320,7 +321,8 @@ export function AddActivityForm({
                       <PopoverContent className="w-auto p-0" align="start" side="top" sideOffset={5}>
                         <Calendar
                           mode="single"
-                          selected={endDateTime}
+                          selected={endDateTime ?? new Date(selectedDate)}
+                          defaultMonth={new Date(selectedDate)}
                               onSelect={(date) => {
                                 if (date) {
                                   // If there's an existing time, preserve it
