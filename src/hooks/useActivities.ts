@@ -198,6 +198,12 @@ export function useActivities(selectedDate: string) {
     }
   };
 
+  const reorderTodos = (reorderedTodos: Activity[]) => {
+    const timelineActivities = activities.filter(activity => activity.time);
+    const newActivities = [...timelineActivities, ...reorderedTodos];
+    saveActivities(newActivities);
+  };
+
   // Separate timeline and to-do items
   const timelineItems = activities
     .filter(activity => activity.time)
@@ -216,5 +222,6 @@ export function useActivities(selectedDate: string) {
     updateActivity,
     deleteActivity,
     toggleTaskCompletion,
+    reorderTodos,
   };
 }

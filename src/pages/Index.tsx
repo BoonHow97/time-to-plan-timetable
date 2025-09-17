@@ -31,6 +31,7 @@ const Index = () => {
     updateActivity,
     deleteActivity,
     toggleTaskCompletion,
+    reorderTodos,
   } = useActivities(selectedDate);
 
   // Filter activities based on search and category (only for day view)
@@ -123,6 +124,7 @@ const Index = () => {
                 onEdit={handleEditActivity}
                 onDelete={handleDeleteActivity}
                 onToggleComplete={toggleTaskCompletion}
+                onReorder={reorderTodos}
                 currentDate={selectedDate}
               />
             </div>
