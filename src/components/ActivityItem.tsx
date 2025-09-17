@@ -50,9 +50,9 @@ export function ActivityItem({
               {isStartDate && activity.time ? (
                 <div className="text-sm font-bold text-foreground">
                   {new Date(`2000-01-01T${activity.time}`).toLocaleTimeString([], {
-                    hour: 'numeric',
+                    hour: '2-digit',
                     minute: '2-digit',
-                    hour12: true,
+                    hour12: false,
                   })}
                 </div>
               ) : isMultiDay ? (
@@ -73,9 +73,9 @@ export function ActivityItem({
                   {activity.endTime && (
                     <div>
                       {new Date(`2000-01-01T${activity.endTime}`).toLocaleTimeString([], {
-                        hour: 'numeric',
+                        hour: '2-digit',
                         minute: '2-digit',
-                        hour12: true,
+                        hour12: false,
                       })}
                     </div>
                   )}
@@ -86,9 +86,9 @@ export function ActivityItem({
                 <div className="text-xs text-muted-foreground">
                   to{' '}
                   {new Date(`2000-01-01T${activity.endTime}`).toLocaleTimeString([], {
-                    hour: 'numeric',
+                    hour: '2-digit',
                     minute: '2-digit',
-                    hour12: true,
+                    hour12: false,
                   })}
                 </div>
               )}
