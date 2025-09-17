@@ -113,11 +113,7 @@ export function CalendarGrid({
                     >
                       {activity.time && (
                         <span className="font-medium">
-                          {new Date(`2000-01-01T${activity.time}`).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: false,
-                          })}
+                          {activity.time}
                         </span>
                       )}
                       {activity.time && ' '}

@@ -49,11 +49,7 @@ export function ActivityItem({
             <div className="flex flex-col min-w-[80px]">
               {isStartDate && activity.time ? (
                 <div className="text-sm font-bold text-foreground">
-                  {new Date(`2000-01-01T${activity.time}`).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false,
-                  })}
+                  {activity.time}
                 </div>
               ) : isMultiDay ? (
                 <div className="text-sm font-bold text-foreground">
@@ -72,11 +68,7 @@ export function ActivityItem({
                   })}</div>
                   {activity.endTime && (
                     <div>
-                      {new Date(`2000-01-01T${activity.endTime}`).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false,
-                      })}
+                      {activity.endTime}
                     </div>
                   )}
                 </div>
@@ -85,11 +77,7 @@ export function ActivityItem({
               {!isMultiDay && activity.endTime && (
                 <div className="text-xs text-muted-foreground">
                   to{' '}
-                  {new Date(`2000-01-01T${activity.endTime}`).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false,
-                  })}
+                  {activity.endTime}
                 </div>
               )}
             </div>
