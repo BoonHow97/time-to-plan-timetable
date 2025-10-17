@@ -27,7 +27,7 @@ Follow these steps to get the development environment running locally.
     ```
 2.  Navigate to the project directory:
     ```sh
-    cd daily-planner-app
+    cd time-to-plan-timetable-app
     ```
 3.  Install the dependencies:
     ```sh
